@@ -24,6 +24,7 @@ public class MenuScreen extends Base2DScreen{
     Vector2 place;
     Vector2 speed;
     Vector2 target;
+    Vector2 step;
 
     public MenuScreen(Game game) {
         super(game);
@@ -36,6 +37,7 @@ public class MenuScreen extends Base2DScreen{
         background = new Texture("sky.jpg");
         place=new Vector2(200, 200);
         target=place.cpy();
+        step=new Vector2(0,0);
         speed = new Vector2(-1,1);
         shipsImg = new Texture("ships.png");
         ship=new TextureRegion(shipsImg,0,2080,256,278);
@@ -49,9 +51,16 @@ public class MenuScreen extends Base2DScreen{
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         speed=(target.cpy().sub(place)).nor().scl(150f);
+        step=speed.scl(delta);
+        if (step.len2()<target.cpy().sub(place).len2()){
+        place.add(step);}
+        else
+        {
+            place=target.cpy();
+        }
         batch.begin();
         batch.draw(background,0,0);
-        place.add(speed.cpy().scl(delta));
+
         batch.draw(ship, place.x-ship.getRegionWidth()/2, place.y-ship.getRegionHeight()/2);
         batch.end();
     }
