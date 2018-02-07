@@ -2,6 +2,8 @@ package ru.naztrans.space;
 
 //import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
+
+import ru.naztrans.space.screen.MenuScreen;
 //import com.badlogic.gdx.Gdx;
 //import com.badlogic.gdx.graphics.GL20;
 //import com.badlogic.gdx.graphics.Texture;
