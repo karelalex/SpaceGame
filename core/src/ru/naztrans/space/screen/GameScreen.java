@@ -14,7 +14,7 @@ import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.engine.math.Rnd;
 import ru.naztrans.space.bullet.BulletPoll;
 import ru.naztrans.space.ship.MainShip;
-import ru.naztrans.space.star.Star;
+import ru.naztrans.space.star.TrackingStar;
 
 
 /**
@@ -22,12 +22,12 @@ import ru.naztrans.space.star.Star;
  */
 
 public class GameScreen extends Base2DScreen {
-    private static final int NUMBER_OF_STARS = 5;
+    private static final int NUMBER_OF_STARS = 20;
     private Texture backgroundTexture;
     private Background background;
     private TextureAtlas atlas;
     private MainShip mainShip;
-    private Star[] stars;
+    private TrackingStar[] stars;
     private BulletPoll bp;
 
     public GameScreen(Game game) {
@@ -42,9 +42,9 @@ public class GameScreen extends Base2DScreen {
         atlas = new TextureAtlas("mainAtlas.tpack");
         bp=new BulletPoll(atlas);
         mainShip = new MainShip(atlas, bp);
-        stars = new Star[NUMBER_OF_STARS];
+        stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
-            stars[i] = new Star(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.01f);
+            stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.01f, mainShip.getV());
         }
     }
 

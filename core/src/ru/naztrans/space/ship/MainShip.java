@@ -18,6 +18,11 @@ public class MainShip extends Sprite {
     private static final float BOTTOM_MARGIN = 0.05f;
 
     private final Vector2 v0 = new Vector2(0.5f, 0.0f);
+
+    public Vector2 getV() {
+        return v;
+    }
+
     private final Vector2 v = new Vector2();
 
     private boolean pressedLeft;

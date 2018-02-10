@@ -61,6 +61,7 @@ public abstract class SpritesPool<T extends Sprite> {
             throw new RuntimeException("Попытка удаления несуществующего объекта");
         }
         freeObjects.add(object);
+        System.out.println("Освободился объект");
     }
 
     public void dispose() {
