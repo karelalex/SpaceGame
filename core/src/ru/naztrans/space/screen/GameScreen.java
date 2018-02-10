@@ -12,8 +12,10 @@ import ru.naztrans.space.Background;
 import ru.naztrans.space.engine.Base2DScreen;
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.engine.math.Rnd;
+import ru.naztrans.space.bullet.BulletPoll;
 import ru.naztrans.space.ship.MainShip;
 import ru.naztrans.space.star.Star;
+
 
 /**
  * Created by alexk on 07.02.2018.
@@ -26,6 +28,7 @@ public class GameScreen extends Base2DScreen {
     private TextureAtlas atlas;
     private MainShip mainShip;
     private Star[] stars;
+    private BulletPoll bp;
 
     public GameScreen(Game game) {
         super(game);
@@ -37,7 +40,8 @@ public class GameScreen extends Base2DScreen {
         backgroundTexture = new Texture("sky.jpg");
         background = new Background(new TextureRegion(backgroundTexture));
         atlas = new TextureAtlas("mainAtlas.tpack");
-        mainShip = new MainShip(atlas);
+        bp=new BulletPoll(atlas);
+        mainShip = new MainShip(atlas, bp);
         stars = new Star[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
             stars[i] = new Star(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.01f);
@@ -63,6 +67,7 @@ public class GameScreen extends Base2DScreen {
             stars[i].draw(batch);
         }
         mainShip.draw(batch);
+        bp.drawActiveObjects(batch);
         batch.end();
     }
 
@@ -71,6 +76,8 @@ public class GameScreen extends Base2DScreen {
             stars[i].update(delta);
         }
         mainShip.update(delta);
+        bp.updateActiveObjects(delta);
+        bp.freeAllDestroyedActiveObjects();
     }
 
     @Override
@@ -89,6 +96,7 @@ public class GameScreen extends Base2DScreen {
         super.dispose();
         backgroundTexture.dispose();
         atlas.dispose();
+        bp.dispose();
     }
 
     @Override

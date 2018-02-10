@@ -4,8 +4,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.naztrans.space.bullet.Bullet;
 import ru.naztrans.space.engine.Sprite;
 import ru.naztrans.space.engine.math.Rect;
+import ru.naztrans.space.bullet.BulletPoll;
 
 /**
  * Created by alexk on 10.02.2018.
@@ -23,10 +25,12 @@ public class MainShip extends Sprite {
 
     private Rect worldBounds;
     private int currentPointer;
+    private BulletPoll bulletPoll;
 
-    public MainShip(TextureAtlas atlas) {
+    public MainShip(TextureAtlas atlas, BulletPoll bp) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         setHeightProportion(SHIP_HEIGHT);
+        this.bulletPoll=bp;
     }
 
     @Override
@@ -83,6 +87,9 @@ public class MainShip extends Sprite {
                     stop();
                 }
                 break;
+            case Input.Keys.UP:
+                fire();
+                break;
         }
     }
 
@@ -113,5 +120,11 @@ public class MainShip extends Sprite {
 
     private void stop() {
         v.setZero();
+    }
+    void fire(){
+        Bullet b=(Bullet)bulletPoll.obtain();
+        b.setBottom(this.getTop()-0.02f);
+        b.setLeft(this.getLeft()+this.getHalfWidth()-b.getHalfWidth());
+        b.resize(worldBounds);
     }
 }
