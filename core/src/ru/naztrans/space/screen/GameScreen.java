@@ -28,7 +28,7 @@ public class GameScreen extends Base2DScreen {
     private TextureAtlas atlas;
     private MainShip mainShip;
     private TrackingStar[] stars;
-    private BulletPool bp;
+    private final BulletPool  bp=new BulletPool();;
 
     public GameScreen(Game game) {
         super(game);
@@ -40,7 +40,7 @@ public class GameScreen extends Base2DScreen {
         backgroundTexture = new Texture("sky.jpg");
         background = new Background(new TextureRegion(backgroundTexture));
         atlas = new TextureAtlas("mainAtlas.tpack");
-        bp=new BulletPool();
+
         mainShip = new MainShip(atlas, bp);
         stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
@@ -51,6 +51,7 @@ public class GameScreen extends Base2DScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
+        deleteAllDestroyedObj();
         update(delta);
         draw();
 
@@ -70,6 +71,9 @@ public class GameScreen extends Base2DScreen {
         bp.drawActiveObjects(batch);
         batch.end();
     }
+    public void deleteAllDestroyedObj(){
+        bp.freeAllDestroyedActiveObjects();
+    }
 
     public void update(float delta) {
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
@@ -77,7 +81,7 @@ public class GameScreen extends Base2DScreen {
         }
         mainShip.update(delta);
         bp.updateActiveObjects(delta);
-        bp.freeAllDestroyedActiveObjects();
+
     }
 
     @Override
