@@ -5,15 +5,14 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.naztrans.space.bullet.Bullet;
-import ru.naztrans.space.engine.Sprite;
 import ru.naztrans.space.engine.math.Rect;
-import ru.naztrans.space.bullet.BulletPoll;
+import ru.naztrans.space.bullet.BulletPool;
 
 /**
  * Created by alexk on 10.02.2018.
  */
 
-public class MainShip extends Sprite {
+public class MainShip extends Ship {
     private static final float SHIP_HEIGHT = 0.15f;
     private static final float BOTTOM_MARGIN = 0.05f;
 
@@ -23,19 +22,24 @@ public class MainShip extends Sprite {
         return v;
     }
 
-    private final Vector2 v = new Vector2();
+
 
     private boolean pressedLeft;
     private boolean pressedRight;
 
-    private Rect worldBounds;
-    private int currentPointer;
-    private BulletPoll bulletPoll;
 
-    public MainShip(TextureAtlas atlas, BulletPoll bp) {
+    private int currentPointer;
+
+
+    public MainShip(TextureAtlas atlas, BulletPool bp) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         setHeightProportion(SHIP_HEIGHT);
-        this.bulletPoll=bp;
+        this.bulletPool=bp;
+        this.bulletRegion = atlas.findRegion("bulletMainShip");
+        this.bulletHeight = 0.01f;
+        this.bulletV.set(0, 0.5f);
+        this.bulletDamage = 1;
+        this.reloadInterval = 0.2f;
     }
 
     @Override
@@ -53,7 +57,7 @@ public class MainShip extends Sprite {
 
     @Override
     public void resize(Rect worldBounds) {
-        this.worldBounds = worldBounds;
+        super.resize(worldBounds);
         setBottom(worldBounds.getBottom() + BOTTOM_MARGIN);
     }
 
@@ -126,10 +130,5 @@ public class MainShip extends Sprite {
     private void stop() {
         v.setZero();
     }
-    void fire(){
-        Bullet b=(Bullet)bulletPoll.obtain();
-        b.setBottom(this.getTop()-0.02f);
-        b.setLeft(this.getLeft()+this.getHalfWidth()-b.getHalfWidth());
-        b.resize(worldBounds);
-    }
+
 }

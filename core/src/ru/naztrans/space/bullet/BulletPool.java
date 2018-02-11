@@ -11,7 +11,7 @@ import ru.naztrans.space.engine.pool.SpritesPool;
  * Created by alexk on 10.02.2018.
  */
 
-public class BulletPoll extends SpritesPool {
+public class BulletPool extends SpritesPool<Bullet> {
 
     @Override
     protected Bullet newObject() {

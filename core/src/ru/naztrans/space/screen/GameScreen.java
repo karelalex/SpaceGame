@@ -12,7 +12,7 @@ import ru.naztrans.space.Background;
 import ru.naztrans.space.engine.Base2DScreen;
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.engine.math.Rnd;
-import ru.naztrans.space.bullet.BulletPoll;
+import ru.naztrans.space.bullet.BulletPool;
 import ru.naztrans.space.ship.MainShip;
 import ru.naztrans.space.star.TrackingStar;
 
@@ -28,7 +28,7 @@ public class GameScreen extends Base2DScreen {
     private TextureAtlas atlas;
     private MainShip mainShip;
     private TrackingStar[] stars;
-    private BulletPoll bp;
+    private BulletPool bp;
 
     public GameScreen(Game game) {
         super(game);
@@ -40,7 +40,7 @@ public class GameScreen extends Base2DScreen {
         backgroundTexture = new Texture("sky.jpg");
         background = new Background(new TextureRegion(backgroundTexture));
         atlas = new TextureAtlas("mainAtlas.tpack");
-        bp=new BulletPoll(atlas);
+        bp=new BulletPool();
         mainShip = new MainShip(atlas, bp);
         stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
