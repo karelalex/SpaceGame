@@ -13,6 +13,8 @@ import ru.naztrans.space.engine.Base2DScreen;
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.engine.math.Rnd;
 import ru.naztrans.space.bullet.BulletPool;
+import ru.naztrans.space.explosion.Explosion;
+import ru.naztrans.space.explosion.ExplosionPool;
 import ru.naztrans.space.ship.MainShip;
 import ru.naztrans.space.star.TrackingStar;
 
@@ -28,7 +30,8 @@ public class GameScreen extends Base2DScreen {
     private TextureAtlas atlas;
     private MainShip mainShip;
     private TrackingStar[] stars;
-    private final BulletPool  bp=new BulletPool();;
+    private final BulletPool  bp=new BulletPool();
+    private  ExplosionPool ep;
 
     public GameScreen(Game game) {
         super(game);
@@ -46,6 +49,7 @@ public class GameScreen extends Base2DScreen {
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
             stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.01f, mainShip.getV());
         }
+        ep=new ExplosionPool(atlas);
     }
 
     @Override
@@ -69,10 +73,12 @@ public class GameScreen extends Base2DScreen {
         }
         mainShip.draw(batch);
         bp.drawActiveObjects(batch);
+        ep.drawActiveObjects(batch);
         batch.end();
     }
     public void deleteAllDestroyedObj(){
         bp.freeAllDestroyedActiveObjects();
+        ep.freeAllDestroyedActiveObjects();
     }
 
     public void update(float delta) {
@@ -81,6 +87,7 @@ public class GameScreen extends Base2DScreen {
         }
         mainShip.update(delta);
         bp.updateActiveObjects(delta);
+        ep.updateActiveObjects(delta);
 
     }
 
@@ -118,6 +125,8 @@ public class GameScreen extends Base2DScreen {
     @Override
     protected void touchDown(Vector2 touch, int pointer) {
         mainShip.touchDown(touch, pointer);
+        Explosion explosion=ep.obtain();
+        explosion.set(0.1f, touch);
     }
 
     @Override

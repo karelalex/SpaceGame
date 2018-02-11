@@ -45,6 +45,11 @@ public class MainShip extends Ship {
     @Override
     public void update(float delta) {
         pos.mulAdd(v, delta);
+        reloadTimer+=delta;
+        if (reloadTimer>=reloadInterval){
+            reloadTimer=0;
+            fire();
+        }
         if (getRight() > worldBounds.getRight()) {
             setRight(worldBounds.getRight());
             stop();
