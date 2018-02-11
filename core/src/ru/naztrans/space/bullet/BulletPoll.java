@@ -12,14 +12,9 @@ import ru.naztrans.space.engine.pool.SpritesPool;
  */
 
 public class BulletPoll extends SpritesPool {
-    private TextureAtlas atlas;
-    public BulletPoll (TextureAtlas atlas){
-        this.atlas=atlas;
-    }
+
     @Override
-    protected Sprite newObject() {
-        Sprite b;
-        b = new Bullet(atlas);
-        return b;
+    protected Bullet newObject() {
+        return new Bullet();
     }
 }
