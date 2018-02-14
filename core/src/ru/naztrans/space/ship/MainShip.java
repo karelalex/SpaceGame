@@ -5,7 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
-import ru.naztrans.space.bullet.Bullet;
+
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.bullet.BulletPool;
 

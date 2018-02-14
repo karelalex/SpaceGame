@@ -17,6 +17,7 @@ import ru.naztrans.space.engine.math.Rnd;
 import ru.naztrans.space.bullet.BulletPool;
 import ru.naztrans.space.explosion.Explosion;
 import ru.naztrans.space.explosion.ExplosionPool;
+import ru.naztrans.space.ship.EnemyShipPool;
 import ru.naztrans.space.ship.MainShip;
 import ru.naztrans.space.star.TrackingStar;
 
@@ -36,6 +37,7 @@ public class GameScreen extends Base2DScreen {
     private  ExplosionPool ep;
     private Sound explosionSound, mainshipFireSound;
     private Music music;
+    private EnemyShipPool enemyShipPool;
 
     public GameScreen(Game game) {
         super(game);
@@ -47,12 +49,13 @@ public class GameScreen extends Base2DScreen {
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/music.mp3"));
         music.setLooping(true);
         music.play();
+
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
         mainshipFireSound=Gdx.audio.newSound(Gdx.files.internal("sounds/bullet.wav"));
         backgroundTexture = new Texture("textures/sky.jpg");
         background = new Background(new TextureRegion(backgroundTexture));
         atlas = new TextureAtlas("textures/mainAtlas.tpack");
-
+        enemyShipPool= new EnemyShipPool(atlas,bp,Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav")));
         mainShip = new MainShip(atlas, bp, mainshipFireSound);
         stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
@@ -83,11 +86,13 @@ public class GameScreen extends Base2DScreen {
         mainShip.draw(batch);
         bp.drawActiveObjects(batch);
         ep.drawActiveObjects(batch);
+        enemyShipPool.drawActiveObjects(batch);
         batch.end();
     }
     public void deleteAllDestroyedObj(){
         bp.freeAllDestroyedActiveObjects();
         ep.freeAllDestroyedActiveObjects();
+        enemyShipPool.freeAllDestroyedActiveObjects();
     }
 
     public void update(float delta) {
@@ -97,6 +102,8 @@ public class GameScreen extends Base2DScreen {
         mainShip.update(delta);
         bp.updateActiveObjects(delta);
         ep.updateActiveObjects(delta);
+        enemyShipPool.updateActiveObjects(delta);
+        enemyShipPool.update(delta);
 
     }
 
@@ -109,6 +116,7 @@ public class GameScreen extends Base2DScreen {
             stars[i].resize(worldBounds);
         }
         mainShip.resize(worldBounds);
+        enemyShipPool.resize(worldBounds);
     }
 
     @Override
