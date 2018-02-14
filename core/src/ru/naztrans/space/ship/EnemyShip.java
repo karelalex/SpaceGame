@@ -18,14 +18,20 @@ public class EnemyShip extends Ship {
     private final float SHIP_HEIGHT=  0.10f;
     private TextureAtlas atlas;
     private Vector2 velosity;
-    private Rect worldBounds;
+
 
     EnemyShip(TextureAtlas atlas, BulletPool bp, Sound fireSound){
         super(atlas.findRegion("enemy0"), 1, 2, 2);
         this.atlas=atlas;
         setHeightProportion(SHIP_HEIGHT);
         velosity=new Vector2();
-        worldBounds=new Rect();
+        this.bulletPool=bp;
+        this.fireSound=fireSound;
+        this.bulletRegion = atlas.findRegion("bulletEnemy");
+        this.bulletHeight = 0.01f;
+        this.bulletV.set(0, -0.5f);
+        this.bulletDamage = 1;
+        this.reloadInterval = 0.4f;
 
     }
     public void set (int texture,
@@ -48,6 +54,11 @@ public class EnemyShip extends Ship {
         pos.mulAdd(velosity,delta);
         if (this.getTop()<worldBounds.getBottom()){
             this.isDestroyed=true;
+        }
+        reloadTimer+=delta;
+        if (reloadTimer>=reloadInterval){
+            reloadTimer=0;
+            fire();
         }
     }
 

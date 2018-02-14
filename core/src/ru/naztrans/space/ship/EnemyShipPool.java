@@ -2,10 +2,13 @@ package ru.naztrans.space.ship;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+
+
+import java.util.Random;
 
 import ru.naztrans.space.bullet.BulletPool;
 import ru.naztrans.space.engine.math.Rect;
+import ru.naztrans.space.engine.math.Rnd;
 import ru.naztrans.space.engine.pool.SpritesPool;
 
 /**
@@ -18,12 +21,15 @@ public class EnemyShipPool extends SpritesPool<EnemyShip> {
     private Sound fs;
     private float interval;
     private Rect worldBounds;
+    private Random rnd;
+
 
     public EnemyShipPool (TextureAtlas atlas, BulletPool bp, Sound fireSound){
         this.atlas=atlas;
         this.bp=bp;
         this.fs=fireSound;
         worldBounds=new Rect();
+        rnd=new Random();
     }
 
 
@@ -37,7 +43,7 @@ public class EnemyShipPool extends SpritesPool<EnemyShip> {
         if (interval>2f){
             interval=0;
             EnemyShip e=this.obtain();
-            e.set(0,0,0.1f,worldBounds);
+            e.set(rnd.nextInt(3), Rnd.nextFloat(worldBounds.getLeft(), worldBounds.getRight()),0.2f+Rnd.nextFloat(-0.1f, 0.1f),worldBounds);
         }
     }
 
