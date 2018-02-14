@@ -11,19 +11,19 @@ import ru.naztrans.space.engine.Sprite;
  */
 
 public class Explosion extends Sprite{
-    //private Sound sound;
+    private Sound sound;
     private float animateInterval = 0.017f; //время между кадрами анимации
     private float animateTimer;
 
-    public Explosion(TextureRegion region, int rows, int cols, int frames) {
+    public Explosion(TextureRegion region, int rows, int cols, int frames, Sound sound) {
         super(region, rows, cols, frames);
-        //this.sound = sound;
+        this.sound = sound;
     }
 
     public void set(float height, Vector2 pos) {
         this.pos.set(pos);
         setHeightProportion(height);
-        //sound.play();
+        sound.play(0.1f);
     }
 
     @Override

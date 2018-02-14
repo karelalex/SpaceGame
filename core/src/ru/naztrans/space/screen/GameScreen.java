@@ -2,6 +2,8 @@ package ru.naztrans.space.screen;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -32,6 +34,8 @@ public class GameScreen extends Base2DScreen {
     private TrackingStar[] stars;
     private final BulletPool  bp=new BulletPool();
     private  ExplosionPool ep;
+    private Sound explosionSound, mainshipFireSound;
+    private Music music;
 
     public GameScreen(Game game) {
         super(game);
@@ -40,16 +44,21 @@ public class GameScreen extends Base2DScreen {
     @Override
     public void show() {
         super.show();
-        backgroundTexture = new Texture("sky.jpg");
+        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/music.mp3"));
+        music.setLooping(true);
+        music.play();
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
+        mainshipFireSound=Gdx.audio.newSound(Gdx.files.internal("sounds/bullet.wav"));
+        backgroundTexture = new Texture("textures/sky.jpg");
         background = new Background(new TextureRegion(backgroundTexture));
-        atlas = new TextureAtlas("mainAtlas.tpack");
+        atlas = new TextureAtlas("textures/mainAtlas.tpack");
 
-        mainShip = new MainShip(atlas, bp);
+        mainShip = new MainShip(atlas, bp, mainshipFireSound);
         stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
             stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.01f, mainShip.getV());
         }
-        ep=new ExplosionPool(atlas);
+        ep=new ExplosionPool(atlas, explosionSound);
     }
 
     @Override
@@ -108,6 +117,8 @@ public class GameScreen extends Base2DScreen {
         backgroundTexture.dispose();
         atlas.dispose();
         bp.dispose();
+        ep.dispose();
+        explosionSound.dispose();
     }
 
     @Override

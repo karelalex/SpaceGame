@@ -1,5 +1,6 @@
 package ru.naztrans.space.ship;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
@@ -27,6 +28,7 @@ public abstract class Ship extends Sprite {
 
     protected float reloadInterval; // время перезарядки
     protected float reloadTimer; // таймер для стрельбы
+    protected Sound fireSound;
 
     public Ship(TextureRegion region, int rows, int cols, int frames) {
         super(region, rows, cols, frames);
@@ -40,5 +42,6 @@ public abstract class Ship extends Sprite {
     protected void fire() {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
+        fireSound.play();
     }
 }
