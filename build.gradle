@@ -1,5 +1,5 @@
 buildscript {
-    
+
 
     repositories {
         mavenLocal()
@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.0'
-        
+
 
     }
 }
@@ -44,7 +44,7 @@ project(":desktop") {
         compile project(":core")
         compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        
+
     }
 }
 
@@ -61,7 +61,7 @@ project(":android") {
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-        
+
     }
 }
 
@@ -73,7 +73,7 @@ project(":core") {
 
         compile project(":engine")
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        
+
     }
 }
 
@@ -81,7 +81,7 @@ project(":engine") {
     apply plugin: "java"
 
     sourceCompatibility = 1.6
-    sourceSets.main.java.srcDirs = [ "src/" ]
+    sourceSets.main.java.srcDirs = ["src/"]
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"

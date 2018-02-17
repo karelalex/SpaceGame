@@ -4,10 +4,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.sun.org.apache.regexp.internal.RE;
 
 
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.bullet.BulletPool;
+import ru.naztrans.space.explosion.ExplosionPool;
 
 /**
  * Created by alexk on 10.02.2018.
@@ -32,14 +34,14 @@ public class MainShip extends Ship {
     private int currentPointer;
 
 
-    public MainShip(TextureAtlas atlas, BulletPool bp, Sound fireSound) {
-        super(atlas.findRegion("main_ship"), 1, 2, 2);
+    public MainShip(TextureAtlas atlas, BulletPool bp, ExplosionPool explosionPool, Rect worldBounds, Sound fireSound) {
+        super(atlas.findRegion("main_ship"), 1, 2, 2, bp, explosionPool, worldBounds, fireSound);
         setHeightProportion(SHIP_HEIGHT);
-        this.bulletPool=bp;
-        this.fireSound=fireSound;
+
+
         this.bulletRegion = atlas.findRegion("bulletMainShip");
         this.bulletHeight = 0.01f;
-        this.bulletV.set(0, 0.5f);
+        this.bulletV.set(0,  0.5f);
         this.bulletDamage = 1;
         this.reloadInterval = 0.2f;
     }

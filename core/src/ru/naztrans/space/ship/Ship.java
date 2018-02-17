@@ -8,6 +8,8 @@ import ru.naztrans.space.bullet.Bullet;
 import ru.naztrans.space.engine.Sprite;
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.bullet.BulletPool;
+import ru.naztrans.space.explosion.Explosion;
+import ru.naztrans.space.explosion.ExplosionPool;
 
 /**
  * Базовый класс для кораблей
@@ -18,6 +20,8 @@ public abstract class Ship extends Sprite {
     protected final Vector2 v = new Vector2(); // скорость корабля
     protected Rect worldBounds; // границы мира
 
+    protected int hp; //количество жизней
+    protected ExplosionPool explosionPool;
     protected BulletPool bulletPool;
     protected TextureRegion bulletRegion;
 
@@ -30,8 +34,18 @@ public abstract class Ship extends Sprite {
     protected float reloadTimer; // таймер для стрельбы
     protected Sound fireSound;
 
-    public Ship(TextureRegion region, int rows, int cols, int frames) {
+    public Ship(TextureRegion region, int rows, int cols, int frames, BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds, Sound fireSound) {
         super(region, rows, cols, frames);
+        this.bulletPool=bulletPool;
+        this.explosionPool=explosionPool;
+        this.worldBounds=worldBounds;
+        this.fireSound=fireSound;
+    }
+    public Ship(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds, Sound fireSound) {
+        this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
+        this.worldBounds = worldBounds;
+        this.fireSound=fireSound;
     }
 
     @Override
@@ -43,5 +57,9 @@ public abstract class Ship extends Sprite {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, pos, bulletV, bulletHeight, worldBounds, bulletDamage);
         fireSound.play();
+    }
+    public void boom(){
+        Explosion explosion=explosionPool.obtain();
+        explosion.set(getHeight(), pos);
     }
 }

@@ -17,6 +17,7 @@ import ru.naztrans.space.engine.math.Rnd;
 import ru.naztrans.space.bullet.BulletPool;
 import ru.naztrans.space.explosion.Explosion;
 import ru.naztrans.space.explosion.ExplosionPool;
+import ru.naztrans.space.ship.EnemyShipEmmiter;
 import ru.naztrans.space.ship.EnemyShipPool;
 import ru.naztrans.space.ship.MainShip;
 import ru.naztrans.space.star.TrackingStar;
@@ -35,9 +36,11 @@ public class GameScreen extends Base2DScreen {
     private TrackingStar[] stars;
     private final BulletPool  bp=new BulletPool();
     private  ExplosionPool ep;
-    private Sound explosionSound, mainshipFireSound;
+
+    private Sound explosionSound, mainshipFireSound, enemyShipFireSound;
     private Music music;
     private EnemyShipPool enemyShipPool;
+    private EnemyShipEmmiter enemyShipEmmiter;
 
     public GameScreen(Game game) {
         super(game);
@@ -51,17 +54,22 @@ public class GameScreen extends Base2DScreen {
         music.play();
 
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
-        mainshipFireSound=Gdx.audio.newSound(Gdx.files.internal("sounds/bullet.wav"));
+        enemyShipFireSound=Gdx.audio.newSound(Gdx.files.internal("sounds/bullet.wav"));
+        mainshipFireSound=Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav"));
         backgroundTexture = new Texture("textures/sky.jpg");
         background = new Background(new TextureRegion(backgroundTexture));
         atlas = new TextureAtlas("textures/mainAtlas.tpack");
-        enemyShipPool= new EnemyShipPool(atlas,bp,Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav")));
-        mainShip = new MainShip(atlas, bp, mainshipFireSound);
+        ep=new ExplosionPool(atlas, explosionSound);
+        mainShip = new MainShip(atlas, bp, ep, worldBounds, mainshipFireSound);
+        enemyShipPool= new EnemyShipPool(bp,ep,worldBounds,enemyShipFireSound,mainShip);
+        enemyShipEmmiter = new EnemyShipEmmiter(enemyShipPool, worldBounds,atlas);
+
+
         stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
             stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.01f, mainShip.getV());
         }
-        ep=new ExplosionPool(atlas, explosionSound);
+
     }
 
     @Override
@@ -103,7 +111,7 @@ public class GameScreen extends Base2DScreen {
         bp.updateActiveObjects(delta);
         ep.updateActiveObjects(delta);
         enemyShipPool.updateActiveObjects(delta);
-        enemyShipPool.update(delta);
+        enemyShipEmmiter.generateEnemy(delta);
 
     }
 
@@ -116,7 +124,7 @@ public class GameScreen extends Base2DScreen {
             stars[i].resize(worldBounds);
         }
         mainShip.resize(worldBounds);
-        enemyShipPool.resize(worldBounds);
+        //enemyShipPool.resize(worldBounds);
     }
 
     @Override
@@ -127,6 +135,9 @@ public class GameScreen extends Base2DScreen {
         bp.dispose();
         ep.dispose();
         explosionSound.dispose();
+        enemyShipFireSound.dispose();
+        mainshipFireSound.dispose();
+        music.dispose();
     }
 
     @Override
@@ -144,8 +155,7 @@ public class GameScreen extends Base2DScreen {
     @Override
     protected void touchDown(Vector2 touch, int pointer) {
         mainShip.touchDown(touch, pointer);
-        Explosion explosion=ep.obtain();
-        explosion.set(0.1f, touch);
+
     }
 
     @Override

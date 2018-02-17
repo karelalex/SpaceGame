@@ -1,65 +1,92 @@
 package ru.naztrans.space.ship;
 
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.naztrans.space.bullet.BulletPool;
-import ru.naztrans.space.engine.Sprite;
+
 import ru.naztrans.space.engine.math.Rect;
-import ru.naztrans.space.engine.utils.Regions;
+
+import ru.naztrans.space.explosion.ExplosionPool;
 
 /**
  * Created by alexk on 14.02.2018.
  */
 
 public class EnemyShip extends Ship {
-    private final float SHIP_HEIGHT=  0.10f;
-    private TextureAtlas atlas;
-    private Vector2 velosity;
 
+    private enum State {DESCENT, FIGHT}
 
-    EnemyShip(TextureAtlas atlas, BulletPool bp, Sound fireSound){
-        super(atlas.findRegion("enemy0"), 1, 2, 2);
-        this.atlas=atlas;
-        setHeightProportion(SHIP_HEIGHT);
-        velosity=new Vector2();
-        this.bulletPool=bp;
-        this.fireSound=fireSound;
-        this.bulletRegion = atlas.findRegion("bulletEnemy");
-        this.bulletHeight = 0.01f;
-        this.bulletV.set(0, -0.5f);
-        this.bulletDamage = 1;
-        this.reloadInterval = 0.4f;
+    private MainShip mainShip;
+    private State state;
 
-    }
-    public void set (int texture,
-                     float x,
-                     float vy,
-                        Rect worldBounds
-                     )
-    {
-        this.regions= Regions.split(atlas.findRegion("enemy"+texture), 1, 2, 2);
+    private Vector2 descentV = new Vector2(0, -0.15f);
+    private Vector2 v0 = new Vector2();
 
-        setLeft(x-this.getHalfWidth());
-        velosity.set(0,-vy);
-        this.worldBounds=worldBounds;
-        setBottom(worldBounds.getTop());
+    public EnemyShip(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds,  Sound shootSound, MainShip mainShip) {
+        super(bulletPool, explosionPool, worldBounds, shootSound);
+        this.mainShip = mainShip;
+        this.v.set(v0);
     }
 
     @Override
     public void update(float delta) {
         super.update(delta);
-        pos.mulAdd(velosity,delta);
-        if (this.getTop()<worldBounds.getBottom()){
-            this.isDestroyed=true;
-        }
-        reloadTimer+=delta;
-        if (reloadTimer>=reloadInterval){
-            reloadTimer=0;
-            fire();
+        pos.mulAdd(v, delta);
+        switch (state) {
+            case DESCENT:
+                if (getTop() <= worldBounds.getTop()) {
+                    v.set(v0);
+                    state = State.FIGHT;
+                }
+                break;
+            case FIGHT:
+                reloadTimer += delta;
+                if (reloadTimer >= reloadInterval) {
+                    reloadTimer = 0f;
+                    fire();
+                }
+                if (getBottom() < worldBounds.getBottom()) {
+                    //mainShip.damage(bulletDamage);
+                    boom();
+                    setDestroyed(true);
+                }
+                break;
         }
     }
 
+    public void set(
+            TextureRegion[] regions,
+            Vector2 v0,
+            TextureRegion bulletRegion,
+            float bulletHeight,
+            float bulletVY,
+            int bulletDamage,
+            float reloadInterval,
+            float height,
+            int hp
+    ) {
+        this.regions = regions;
+        this.v0.set(v0);
+        this.bulletRegion = bulletRegion;
+        this.bulletHeight = bulletHeight;
+        this.bulletV.set(0f, bulletVY);
+        this.bulletDamage = bulletDamage;
+        this.reloadInterval = reloadInterval;
+        this.hp = hp;
+        setHeightProportion(height);
+        v.set(descentV);
+        state = State.DESCENT;
+        reloadTimer = reloadInterval;
+    }
+
+    public boolean isBulletCollision(Rect bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getBottom() > getTop()
+                || bullet.getTop() < pos.y
+        );
+    }
 }
