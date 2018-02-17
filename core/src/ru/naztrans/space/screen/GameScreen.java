@@ -10,13 +10,16 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.List;
+
 import ru.naztrans.space.Background;
 import ru.naztrans.space.engine.Base2DScreen;
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.engine.math.Rnd;
 import ru.naztrans.space.bullet.BulletPool;
-import ru.naztrans.space.explosion.Explosion;
+
 import ru.naztrans.space.explosion.ExplosionPool;
+import ru.naztrans.space.ship.EnemyShip;
 import ru.naztrans.space.ship.EnemyShipEmmiter;
 import ru.naztrans.space.ship.EnemyShipPool;
 import ru.naztrans.space.ship.MainShip;
@@ -75,12 +78,26 @@ public class GameScreen extends Base2DScreen {
     @Override
     public void render(float delta) {
         super.render(delta);
+        checkCollisions();
         deleteAllDestroyedObj();
         update(delta);
         draw();
 
     }
 
+    public void checkCollisions(){
+        List<EnemyShip> enemyShipList=enemyShipPool.getActiveObjects();
+        for (EnemyShip e: enemyShipList ){
+            if (e.isDestroyed()){
+                continue;
+            }
+            float minDist = e.getHalfWidth()+mainShip.getHalfWidth();
+            if (e.pos.dst2(mainShip.pos)<minDist*minDist) {
+                e.setDestroyed(true);
+                e.boom();
+            }
+        }
+    }
     public void draw() {
         Gdx.gl.glClearColor(0.7f, 0.3f, 0.7f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

@@ -33,6 +33,10 @@ public abstract class SpritesPool<T extends Sprite> {
         return object;
     }
 
+    public List<T> getActiveObjects() {
+        return activeObjects;
+    }
+
     public void updateActiveObjects(float delta) {
         for (int i = 0; i < activeObjects.size(); i++) {
             activeObjects.get(i).update(delta);
