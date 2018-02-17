@@ -114,6 +114,15 @@ public class GameScreen extends Base2DScreen {
                 }
             }
         }
+        for (Bullet b: bulletList){
+            if(b.getOwner()==mainShip||b.isDestroyed()){
+                continue;
+            }
+            if (mainShip.isBulletCollision(b)){
+                mainShip.damage(b.getDamage());
+                b.setDestroyed(true);
+            }
+        }
     }
     public void draw() {
         Gdx.gl.glClearColor(0.7f, 0.3f, 0.7f, 1);

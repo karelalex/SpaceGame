@@ -140,5 +140,12 @@ public class MainShip extends Ship {
     private void stop() {
         v.setZero();
     }
+    public boolean isBulletCollision(Rect bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getTop() < getBottom()
+                || bullet.getBottom() > pos.y
+        );
+    }
 
 }
