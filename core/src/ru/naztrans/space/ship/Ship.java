@@ -81,7 +81,9 @@ public abstract class Ship extends Sprite {
     public void damage(int damage){
         frame=1;
         damageAnimateTimer=0;
+        hp-=damage;
 
     }
+
     public abstract boolean isBulletCollision(Rect bullet);
 }

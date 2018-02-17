@@ -34,6 +34,7 @@ public class EnemyShip extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
+        checkHP();
         pos.mulAdd(v, delta);
         switch (state) {
             case DESCENT:
@@ -88,5 +89,11 @@ public class EnemyShip extends Ship {
                 || bullet.getBottom() > getTop()
                 || bullet.getTop() < pos.y
         );
+    }
+    private void checkHP() {
+        if(hp<=0){
+            this.isDestroyed=true;
+            boom();
+        }
     }
 }
