@@ -17,6 +17,8 @@ import ru.naztrans.space.explosion.ExplosionPool;
 
 public abstract class Ship extends Sprite {
 
+    private static final float DAMAGE_ANIMATE_INTERVAL=0.1f;
+    private float damageAnimateTimer=DAMAGE_ANIMATE_INTERVAL;
     protected final Vector2 v = new Vector2(); // скорость корабля
     protected Rect worldBounds; // границы мира
 
@@ -61,5 +63,24 @@ public abstract class Ship extends Sprite {
     public void boom(){
         Explosion explosion=explosionPool.obtain();
         explosion.set(getHeight(), pos);
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        damageAnimateTimer+=delta;
+        if (damageAnimateTimer>=DAMAGE_ANIMATE_INTERVAL){
+            frame = 0;
+        }
+    }
+
+    public int getBulletDamage() {
+        return bulletDamage;
+    }
+
+    public void damage(int damage){
+        frame=1;
+        damageAnimateTimer=0;
+
     }
 }

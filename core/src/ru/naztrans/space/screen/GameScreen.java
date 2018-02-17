@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.List;
 
 import ru.naztrans.space.Background;
+import ru.naztrans.space.bullet.Bullet;
 import ru.naztrans.space.engine.Base2DScreen;
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.engine.math.Rnd;
@@ -95,6 +96,22 @@ public class GameScreen extends Base2DScreen {
             if (e.pos.dst2(mainShip.pos)<minDist*minDist) {
                 e.setDestroyed(true);
                 e.boom();
+                mainShip.damage(e.getBulletDamage());
+            }
+        }
+        List<Bullet> bulletList = bp.getActiveObjects();
+        for (EnemyShip e: enemyShipList ){
+            if (e.isDestroyed()){
+                continue;
+            }
+            for (Bullet b: bulletList){
+                if(b.getOwner()!=mainShip||b.isDestroyed()){
+                    continue;
+                }
+                if (e.isBulletCollision(b)){
+                    e.damage(b.getDamage());
+                    b.setDestroyed(true);
+                }
             }
         }
     }
