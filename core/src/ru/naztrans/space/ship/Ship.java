@@ -82,7 +82,7 @@ public abstract class Ship extends Sprite {
         frame=1;
         damageAnimateTimer=0;
         hp-=damage;
-
+        System.out.println(this.getClass().getCanonicalName()+"hitPoints "+hp);
     }
 
     public abstract boolean isBulletCollision(Rect bullet);

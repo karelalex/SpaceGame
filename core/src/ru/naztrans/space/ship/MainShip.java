@@ -38,7 +38,7 @@ public class MainShip extends Ship {
         super(atlas.findRegion("main_ship"), 1, 2, 2, bp, explosionPool, worldBounds, fireSound);
         setHeightProportion(SHIP_HEIGHT);
 
-
+        this.hp=100;
         this.bulletRegion = atlas.findRegion("bulletMainShip");
         this.bulletHeight = 0.01f;
         this.bulletV.set(0,  0.5f);

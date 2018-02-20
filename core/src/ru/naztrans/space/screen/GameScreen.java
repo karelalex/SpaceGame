@@ -40,6 +40,7 @@ public class GameScreen extends Base2DScreen {
     private TrackingStar[] stars;
     private final BulletPool  bp=new BulletPool();
     private  ExplosionPool ep;
+    private int frags;
 
     private Sound explosionSound, mainshipFireSound, enemyShipFireSound;
     private Music music;
@@ -111,6 +112,10 @@ public class GameScreen extends Base2DScreen {
                 if (e.isBulletCollision(b)){
                     e.damage(b.getDamage());
                     b.setDestroyed(true);
+                    if (e.isDestroyed()){
+                        frags++;
+                        break;
+                    }
                 }
             }
         }
