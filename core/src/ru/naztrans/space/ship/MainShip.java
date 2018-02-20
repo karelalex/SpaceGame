@@ -38,14 +38,19 @@ public class MainShip extends Ship {
         super(atlas.findRegion("main_ship"), 1, 2, 2, bp, explosionPool, worldBounds, fireSound);
         setHeightProportion(SHIP_HEIGHT);
 
-        this.hp=100;
+
         this.bulletRegion = atlas.findRegion("bulletMainShip");
+
+    }
+    public void  setToNewGame(){
+        pos.x=worldBounds.pos.x;
         this.bulletHeight = 0.01f;
         this.bulletV.set(0,  0.5f);
         this.bulletDamage = 1;
         this.reloadInterval = 0.2f;
+        this.hp=100;
+        setDestroyed(false);
     }
-
     @Override
     public void update(float delta) {
         super.update(delta);

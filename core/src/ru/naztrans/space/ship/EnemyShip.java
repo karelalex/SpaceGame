@@ -92,7 +92,7 @@ public class EnemyShip extends Ship {
     }
     private void checkHP() {
         if(hp<=0){
-            this.isDestroyed=true;
+            
             boom();
         }
     }

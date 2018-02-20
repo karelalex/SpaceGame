@@ -25,6 +25,7 @@ import ru.naztrans.space.ship.EnemyShipEmmiter;
 import ru.naztrans.space.ship.EnemyShipPool;
 import ru.naztrans.space.ship.MainShip;
 import ru.naztrans.space.star.TrackingStar;
+import ru.naztrans.space.ui.MessageGameOver;
 
 
 /**
@@ -32,6 +33,8 @@ import ru.naztrans.space.star.TrackingStar;
  */
 
 public class GameScreen extends Base2DScreen {
+    private enum State {PLAYING, GAMEOVER};
+    private State state;
     private static final int NUMBER_OF_STARS = 20;
     private Texture backgroundTexture;
     private Background background;
@@ -46,6 +49,7 @@ public class GameScreen extends Base2DScreen {
     private Music music;
     private EnemyShipPool enemyShipPool;
     private EnemyShipEmmiter enemyShipEmmiter;
+    private MessageGameOver messageGameOver;
 
     public GameScreen(Game game) {
         super(game);
@@ -68,13 +72,14 @@ public class GameScreen extends Base2DScreen {
         mainShip = new MainShip(atlas, bp, ep, worldBounds, mainshipFireSound);
         enemyShipPool= new EnemyShipPool(bp,ep,worldBounds,enemyShipFireSound,mainShip);
         enemyShipEmmiter = new EnemyShipEmmiter(enemyShipPool, worldBounds,atlas);
+        messageGameOver = new MessageGameOver(atlas);
 
 
         stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
             stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.01f, mainShip.getV());
         }
-
+        startNewGame();
     }
 
     @Override
@@ -97,7 +102,7 @@ public class GameScreen extends Base2DScreen {
             if (e.pos.dst2(mainShip.pos)<minDist*minDist) {
                 e.setDestroyed(true);
                 e.boom();
-                mainShip.damage(e.getBulletDamage());
+                mainShip.boom();
             }
         }
         List<Bullet> bulletList = bp.getActiveObjects();
@@ -143,6 +148,9 @@ public class GameScreen extends Base2DScreen {
         bp.drawActiveObjects(batch);
         ep.drawActiveObjects(batch);
         enemyShipPool.drawActiveObjects(batch);
+        if (state==State.GAMEOVER){
+            messageGameOver.draw(batch);
+        }
         batch.end();
     }
     public void deleteAllDestroyedObj(){
@@ -155,11 +163,22 @@ public class GameScreen extends Base2DScreen {
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
             stars[i].update(delta);
         }
-        mainShip.update(delta);
-        bp.updateActiveObjects(delta);
-        ep.updateActiveObjects(delta);
-        enemyShipPool.updateActiveObjects(delta);
-        enemyShipEmmiter.generateEnemy(delta);
+
+
+        switch (state){
+            case PLAYING:
+                mainShip.update(delta);
+                bp.updateActiveObjects(delta);
+                ep.updateActiveObjects(delta);
+                enemyShipPool.updateActiveObjects(delta);
+                enemyShipEmmiter.generateEnemy(delta);
+                if (mainShip.isDestroyed()){
+                    state=State.GAMEOVER;
+                }
+                break;
+            case GAMEOVER:
+                break;
+        }
 
     }
 
@@ -209,5 +228,15 @@ public class GameScreen extends Base2DScreen {
     @Override
     protected void touchUp(Vector2 touch, int pointer) {
         mainShip.touchUp(touch, pointer);
+    }
+
+    private void startNewGame(){
+        state=State.PLAYING;
+        frags = 0;
+
+        mainShip.setToNewGame();
+        bp.freeAllActiveObjects();
+        ep.freeAllActiveObjects();
+        enemyShipPool.freeAllActiveObjects();
     }
 }

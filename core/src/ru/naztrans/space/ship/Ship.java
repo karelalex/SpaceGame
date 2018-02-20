@@ -63,6 +63,7 @@ public abstract class Ship extends Sprite {
     public void boom(){
         Explosion explosion=explosionPool.obtain();
         explosion.set(getHeight(), pos);
+        isDestroyed=true;
     }
 
     @Override

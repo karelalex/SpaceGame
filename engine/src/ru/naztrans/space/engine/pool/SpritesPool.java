@@ -67,7 +67,10 @@ public abstract class SpritesPool<T extends Sprite> {
         freeObjects.add(object);
         System.out.println("Освободился объект");
     }
-
+    public void  freeAllActiveObjects(){
+        freeObjects.addAll(activeObjects);
+        activeObjects.clear();
+    }
     public void dispose() {
         activeObjects.clear();
         freeObjects.clear();
