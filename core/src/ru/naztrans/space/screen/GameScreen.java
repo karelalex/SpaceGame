@@ -9,12 +9,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.List;
 
 import ru.naztrans.space.Background;
 import ru.naztrans.space.bullet.Bullet;
+import ru.naztrans.space.engine.ActionListener;
 import ru.naztrans.space.engine.Base2DScreen;
+import ru.naztrans.space.engine.font.Font;
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.engine.math.Rnd;
 import ru.naztrans.space.bullet.BulletPool;
@@ -26,16 +29,20 @@ import ru.naztrans.space.ship.EnemyShipPool;
 import ru.naztrans.space.ship.MainShip;
 import ru.naztrans.space.star.TrackingStar;
 import ru.naztrans.space.ui.MessageGameOver;
+import ru.naztrans.space.ui.NewGameButton;
 
 
 /**
  * Created by alexk on 07.02.2018.
  */
 
-public class GameScreen extends Base2DScreen {
+public class GameScreen extends Base2DScreen implements ActionListener {
+
+
     private enum State {PLAYING, GAMEOVER};
     private State state;
     private static final int NUMBER_OF_STARS = 20;
+    private static final float FONT_SIZE=0.01f;
     private Texture backgroundTexture;
     private Background background;
     private TextureAtlas atlas;
@@ -50,8 +57,11 @@ public class GameScreen extends Base2DScreen {
     private EnemyShipPool enemyShipPool;
     private EnemyShipEmmiter enemyShipEmmiter;
     private MessageGameOver messageGameOver;
+    private NewGameButton newGameButton;
+    private Font font;
+    private StringBuilder sbFrags, sbHP, sbStage;
 
-    public GameScreen(Game game) {
+    public GameScreen(Game game)  {
         super(game);
     }
 
@@ -73,6 +83,12 @@ public class GameScreen extends Base2DScreen {
         enemyShipPool= new EnemyShipPool(bp,ep,worldBounds,enemyShipFireSound,mainShip);
         enemyShipEmmiter = new EnemyShipEmmiter(enemyShipPool, worldBounds,atlas);
         messageGameOver = new MessageGameOver(atlas);
+        newGameButton = new NewGameButton(atlas, this);
+        this.font = new Font("font/font.fnt", "font/font.png");
+        this.font.setWorldSize(FONT_SIZE);
+        this.sbFrags = new StringBuilder();
+        this.sbHP = new StringBuilder();
+        this.sbStage = new StringBuilder();
 
 
         stars = new TrackingStar[NUMBER_OF_STARS];
@@ -81,11 +97,18 @@ public class GameScreen extends Base2DScreen {
         }
         startNewGame();
     }
-
+    public void printInfo(){
+        sbFrags.setLength(0);
+        sbHP.setLength(0);
+        sbStage.setLength(0);
+        font.draw(batch, sbFrags.append("Frags: ").append(frags), worldBounds.getLeft(), worldBounds.getTop());
+        font.draw(batch, sbHP.append("HP: ").append(mainShip.getHp()), worldBounds.pos.x, worldBounds.getTop(), Align.center);
+        font.draw(batch, sbStage.append("Stage: ").append(enemyShipEmmiter.getStage()), worldBounds.getRight(), worldBounds.getTop(), Align.right);
+    }
     @Override
     public void render(float delta) {
         super.render(delta);
-        checkCollisions();
+        if (state==State.PLAYING) {checkCollisions();}
         deleteAllDestroyedObj();
         update(delta);
         draw();
@@ -117,8 +140,9 @@ public class GameScreen extends Base2DScreen {
                 if (e.isBulletCollision(b)){
                     e.damage(b.getDamage());
                     b.setDestroyed(true);
+                    System.out.println(e.isDestroyed());
                     if (e.isDestroyed()){
-                        frags++;
+                        this.frags++;
                         break;
                     }
                 }
@@ -144,12 +168,17 @@ public class GameScreen extends Base2DScreen {
 
             stars[i].draw(batch);
         }
-        mainShip.draw(batch);
-        bp.drawActiveObjects(batch);
+
         ep.drawActiveObjects(batch);
-        enemyShipPool.drawActiveObjects(batch);
+        printInfo();
         if (state==State.GAMEOVER){
             messageGameOver.draw(batch);
+            newGameButton.draw(batch);
+        }
+        else {
+            mainShip.draw(batch);
+            bp.drawActiveObjects(batch);
+            enemyShipPool.drawActiveObjects(batch);
         }
         batch.end();
     }
@@ -164,14 +193,14 @@ public class GameScreen extends Base2DScreen {
             stars[i].update(delta);
         }
 
-
+        ep.updateActiveObjects(delta);
         switch (state){
             case PLAYING:
                 mainShip.update(delta);
                 bp.updateActiveObjects(delta);
-                ep.updateActiveObjects(delta);
+
                 enemyShipPool.updateActiveObjects(delta);
-                enemyShipEmmiter.generateEnemy(delta);
+                enemyShipEmmiter.generateEnemy(delta, frags);
                 if (mainShip.isDestroyed()){
                     state=State.GAMEOVER;
                 }
@@ -205,6 +234,7 @@ public class GameScreen extends Base2DScreen {
         enemyShipFireSound.dispose();
         mainshipFireSound.dispose();
         music.dispose();
+        font.dispose();
     }
 
     @Override
@@ -221,13 +251,20 @@ public class GameScreen extends Base2DScreen {
 
     @Override
     protected void touchDown(Vector2 touch, int pointer) {
-        mainShip.touchDown(touch, pointer);
-
+        if (state==State.PLAYING){mainShip.touchDown(touch, pointer);}
+        else {
+            newGameButton.touchDown(touch, pointer);
+        }
     }
 
     @Override
     protected void touchUp(Vector2 touch, int pointer) {
-        mainShip.touchUp(touch, pointer);
+        if (state ==State.PLAYING) {
+
+
+            mainShip.touchUp(touch, pointer);
+        }else {
+        newGameButton.touchUp(touch,pointer);}
     }
 
     private void startNewGame(){
@@ -238,5 +275,13 @@ public class GameScreen extends Base2DScreen {
         bp.freeAllActiveObjects();
         ep.freeAllActiveObjects();
         enemyShipPool.freeAllActiveObjects();
+    }
+    @Override
+    public void actionPerformed(Object src) {
+        if (src==newGameButton) {
+            startNewGame();
+        }else {
+            throw  new RuntimeException("Unknown Source Object");
+        }
     }
 }

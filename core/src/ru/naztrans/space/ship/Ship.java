@@ -22,6 +22,10 @@ public abstract class Ship extends Sprite {
     protected final Vector2 v = new Vector2(); // скорость корабля
     protected Rect worldBounds; // границы мира
 
+    public int getHp() {
+        return hp;
+    }
+
     protected int hp; //количество жизней
     protected ExplosionPool explosionPool;
     protected BulletPool bulletPool;
@@ -49,7 +53,12 @@ public abstract class Ship extends Sprite {
         this.worldBounds = worldBounds;
         this.fireSound=fireSound;
     }
+    private void checkHP() {
+        if(hp<=0){
 
+            boom();
+        }
+    }
     @Override
     public void resize(Rect worldBounds) {
         this.worldBounds = worldBounds;
@@ -61,9 +70,11 @@ public abstract class Ship extends Sprite {
         fireSound.play();
     }
     public void boom(){
+        this.setDestroyed(true);
         Explosion explosion=explosionPool.obtain();
         explosion.set(getHeight(), pos);
-        isDestroyed=true;
+        System.out.println(this.isDestroyed+"shps");
+
     }
 
     @Override
@@ -73,6 +84,7 @@ public abstract class Ship extends Sprite {
         if (damageAnimateTimer>=DAMAGE_ANIMATE_INTERVAL){
             frame = 0;
         }
+
     }
 
     public int getBulletDamage() {
@@ -83,6 +95,7 @@ public abstract class Ship extends Sprite {
         frame=1;
         damageAnimateTimer=0;
         hp-=damage;
+        checkHP();
         System.out.println(this.getClass().getCanonicalName()+"hitPoints "+hp);
     }
 
