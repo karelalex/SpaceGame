@@ -42,7 +42,7 @@ public class GameScreen extends Base2DScreen implements ActionListener {
     private enum State {PLAYING, GAMEOVER};
     private State state;
     private static final int NUMBER_OF_STARS = 20;
-    private static final float FONT_SIZE=0.01f;
+    private static final float FONT_SIZE=0.015f;
     private Texture backgroundTexture;
     private Background background;
     private TextureAtlas atlas;
@@ -93,7 +93,7 @@ public class GameScreen extends Base2DScreen implements ActionListener {
 
         stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
-            stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.01f, mainShip.getV());
+            stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.003f, mainShip.getV());
         }
         startNewGame();
     }
@@ -101,9 +101,9 @@ public class GameScreen extends Base2DScreen implements ActionListener {
         sbFrags.setLength(0);
         sbHP.setLength(0);
         sbStage.setLength(0);
-        font.draw(batch, sbFrags.append("Frags: ").append(frags), worldBounds.getLeft(), worldBounds.getTop());
-        font.draw(batch, sbHP.append("HP: ").append(mainShip.getHp()), worldBounds.pos.x, worldBounds.getTop(), Align.center);
-        font.draw(batch, sbStage.append("Stage: ").append(enemyShipEmmiter.getStage()), worldBounds.getRight(), worldBounds.getTop(), Align.right);
+        font.draw(batch, sbFrags.append("Frags: ").append(frags), worldBounds.getLeft(), worldBounds.getTop()-0.01f);
+        font.draw(batch, sbHP.append("HP: ").append(mainShip.getHp()), worldBounds.pos.x, worldBounds.getTop()-0.01f, Align.center);
+        font.draw(batch, sbStage.append("Stage: ").append(enemyShipEmmiter.getStage()), worldBounds.getRight(), worldBounds.getTop() -0.01f, Align.right);
     }
     @Override
     public void render(float delta) {
@@ -125,7 +125,7 @@ public class GameScreen extends Base2DScreen implements ActionListener {
             if (e.pos.dst2(mainShip.pos)<minDist*minDist) {
                 e.setDestroyed(true);
                 e.boom();
-                mainShip.boom();
+                mainShip.damage(e.getCollisionDamage());
             }
         }
         List<Bullet> bulletList = bp.getActiveObjects();

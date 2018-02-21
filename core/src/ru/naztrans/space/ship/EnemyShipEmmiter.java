@@ -13,58 +13,61 @@ import ru.naztrans.space.engine.utils.Regions;
  */
 
 public class EnemyShipEmmiter {
-    private static final float ENEMY_SMALL_HEIGHT = 0.1f;
-    private static final float ENEMY_SMALL_BULLET_HEIGHT = 0.01f;
-    private static final float ENEMY_SMALL_BULLET_VY = -0.3f;
-    private static final int ENEMY_SMALL_BULLET_DAMAGE = 1;
-    private static final float ENEMY_SMALL_RELOAD_INTERVAL = 3f;
-    private static final int ENEMY_SMALL_HP = 1;
+    private enum ShipTypes {SMALL_SHIP("enemy0", 0.1f, 0.01f, 1, 5, 0.3f, 3f, 0.1f, 0.2f, 0f, 1), MIDDLE_SHIP("enemy1",0.11f, 0.02f, 5, 15, 0.25f, 4f, 0.2f, 0.03f, 0f, 5 ),
+        BIG_SHIP("enemy2", 0.2f, 0.04f, 10, 45, 0.3f, 4f, 0.4f, 0.005f, 0f, 20) ;
+        public String tr;
+        public float height, bulletHeight;
+        public int bulletDamage, collisionDamage;
+        public float bulletYVel;
+        public float initialReloadInterval, smallReloadInterval;
+        public float initialYVel, initialXVel;
+        public int initialHP;
 
-    private static final float ENEMY_MIDDLE_HEIGHT = 0.1f;
-    private static final float ENEMY_MIDDLE_BULLET_HEIGHT = 0.02f;
-    private static final float ENEMY_MIDDLE_BULLET_VY = -0.25f;
-    private static final int ENEMY_MIDDLE_BULLET_DAMAGE = 5;
-    private static final float ENEMY_MIDDLE_RELOAD_INTERVAL = 4f;
-    private static final int ENEMY_MIDDLE_HP = 5;
+        ShipTypes(String textureName, float height, float bulletHeight, int bulletDamage, int collisionDamage, float bulletYVel,
+                  float initialReloadInterval, float smallReloadInterval, float initialYVel, float initialXVel, int initialHP) {
+            this.tr=textureName;
+            this.height=height;
+            this.bulletHeight=bulletHeight;
+            this.bulletDamage=bulletDamage;
+            this.collisionDamage=collisionDamage;
+            this.bulletYVel=bulletYVel;
+            this.initialReloadInterval = initialReloadInterval;
+            this.smallReloadInterval=smallReloadInterval;
+            this.initialYVel=initialYVel;
+            this.initialXVel=initialXVel;
+            this.initialHP=initialHP;
 
-    private static final float ENEMY_BIG_HEIGHT = 0.2f;
-    private static final float ENEMY_BIG_BULLET_HEIGHT = 0.04f;
-    private static final float ENEMY_BIG_BULLET_VY = -0.3f;
-    private static final int ENEMY_BIG_BULLET_DAMAGE = 10;
-    private static final float ENEMY_BIG_RELOAD_INTERVAL = 4f;
-    private static final int ENEMY_BIG_HP = 20;
+        }
+    }
 
-    private final Vector2 enemySmallV = new Vector2(0f, -0.2f);
-    private final Vector2 enemyMiddleV = new Vector2(0f, -0.03f);
-    private final Vector2 enemyBigV = new Vector2(0f, -0.005f);
+
+
+
 
     private float generateTimer;
     private float generateInterval = 4f;
 
     private final EnemyShipPool enemyShipPool;
     private Rect worldBounds;
+    private Vector2 tmpV2;
+    private  TextureRegion[] region;
 
-    private final TextureRegion[] enemySmallRegion;
-    private final TextureRegion[] enemyMiddleRegion;
-    private final TextureRegion[] enemyBigRegion;
 
     private TextureRegion bulletRegion;
     private int stage;
-
-
+    private TextureAtlas textureAtlas;
+    private ShipTypes currentship;
     public EnemyShipEmmiter(EnemyShipPool enemyShipPool, Rect worldBounds, TextureAtlas atlas) {
         this.enemyShipPool = enemyShipPool;
         this.worldBounds = worldBounds;
-        enemySmallRegion = Regions.split(atlas.findRegion("enemy0"), 1, 2, 2);
-        enemyMiddleRegion = Regions.split(atlas.findRegion("enemy1"), 1, 2, 2);
-        enemyBigRegion = Regions.split(atlas.findRegion("enemy2"), 1, 2, 2);
-        bulletRegion = atlas.findRegion("bulletEnemy");
+        this.textureAtlas=atlas;
+        this.bulletRegion = textureAtlas.findRegion("bulletEnemy");
     }
     public void setToNewGame(){
         stage=1;
     }
     public void generateEnemy(float delta, int frags) {
-        stage=frags/4+1;
+        stage=frags/20+1;
         generateTimer += delta;
         if (generateInterval <= generateTimer) {
             generateTimer = 0f;
@@ -72,42 +75,17 @@ public class EnemyShipEmmiter {
 
             float type = (float) Math.random();
             if (type<0.7f) {
-                enemy.set(
-                        enemySmallRegion,
-                        enemySmallV,
-                        bulletRegion,
-                        ENEMY_SMALL_BULLET_HEIGHT,
-                        ENEMY_SMALL_BULLET_VY,
-                        ENEMY_SMALL_BULLET_DAMAGE*stage,
-                        ENEMY_SMALL_RELOAD_INTERVAL,
-                        ENEMY_SMALL_HEIGHT,
-                        ENEMY_SMALL_HP*stage
-                );
+                currentship=ShipTypes.SMALL_SHIP;
             } else if (type < 0.9f) {
-                enemy.set(
-                        enemyMiddleRegion,
-                        enemyMiddleV,
-                        bulletRegion,
-                        ENEMY_MIDDLE_BULLET_HEIGHT,
-                        ENEMY_MIDDLE_BULLET_VY,
-                        ENEMY_MIDDLE_BULLET_DAMAGE*stage,
-                        ENEMY_MIDDLE_RELOAD_INTERVAL,
-                        ENEMY_MIDDLE_HEIGHT,
-                        ENEMY_MIDDLE_HP*stage
-                );
+                currentship=ShipTypes.MIDDLE_SHIP;
             } else {
-                enemy.set(
-                        enemyBigRegion,
-                        enemyBigV,
-                        bulletRegion,
-                        ENEMY_BIG_BULLET_HEIGHT,
-                        ENEMY_BIG_BULLET_VY,
-                        ENEMY_BIG_BULLET_DAMAGE*stage,
-                        ENEMY_BIG_RELOAD_INTERVAL,
-                        ENEMY_BIG_HEIGHT,
-                        ENEMY_BIG_HP*stage
-                );
+                currentship=ShipTypes.BIG_SHIP;
             }
+            region=Regions.split(textureAtlas.findRegion(currentship.tr), 1,2,2);
+
+            enemy.set(region, currentship.initialXVel, -currentship.initialYVel,
+                    bulletRegion, currentship.bulletHeight, -currentship.bulletYVel,
+                    currentship.bulletDamage, currentship.collisionDamage, currentship.initialReloadInterval, currentship.smallReloadInterval, 1, currentship.height, currentship.initialHP );
             enemy.pos.x = Rnd.nextFloat(worldBounds.getLeft() + enemy.getHalfWidth(), worldBounds.getRight() - enemy.getHalfWidth());
             enemy.setBottom(worldBounds.getTop());
         }

@@ -22,8 +22,17 @@ public class EnemyShip extends Ship {
     private MainShip mainShip;
     private State state;
 
+
     private Vector2 descentV = new Vector2(0, -0.15f);
     private Vector2 v0 = new Vector2();
+    private float smallReloadInterval;
+
+    public int getCollisionDamage() {
+        return collisionDamage;
+    }
+
+    private int collisionDamage;
+    private int maxBulletCountAtTime;
 
     public EnemyShip(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds,  Sound shootSound, MainShip mainShip) {
         super(bulletPool, explosionPool, worldBounds, shootSound);
@@ -49,40 +58,52 @@ public class EnemyShip extends Ship {
                     reloadTimer = 0f;
                     fire();
                 }
-                if (getBottom() < worldBounds.getBottom()) {
-                    mainShip.damage(bulletDamage);
+                if (getTop() < worldBounds.getBottom()) {
+                    mainShip.damage(bulletDamage*2);
                     //boom();
                     setDestroyed(true);
                 }
                 break;
         }
+        checkBounds();
     }
 
     public void set(
             TextureRegion[] regions,
-            Vector2 v0,
+            float vx, float vy,
             TextureRegion bulletRegion,
             float bulletHeight,
             float bulletVY,
             int bulletDamage,
+            int collisionDamage,
             float reloadInterval,
+            float smallReloadInterval,
+            int maxBulletCountAtTime,
             float height,
             int hp
+
     ) {
         this.regions = regions;
-        this.v0.set(v0);
+        this.v0.set(vx,vy);
         this.bulletRegion = bulletRegion;
         this.bulletHeight = bulletHeight;
         this.bulletV.set(0f, bulletVY);
         this.bulletDamage = bulletDamage;
         this.reloadInterval = reloadInterval;
+        this.collisionDamage=collisionDamage;
+        this.smallReloadInterval=smallReloadInterval;
         this.hp = hp;
+        this.maxBulletCountAtTime=maxBulletCountAtTime;
         setHeightProportion(height);
         v.set(descentV);
         state = State.DESCENT;
         reloadTimer = reloadInterval;
     }
-
+    private void checkBounds(){
+        if (this.getLeft()<=worldBounds.getLeft() || this.getRight()>=worldBounds.getRight()){
+            this.v.set(-v.x, v.y);
+        }
+    }
     public boolean isBulletCollision(Rect bullet) {
         return !(bullet.getRight() < getLeft()
                 || bullet.getLeft() > getRight()
