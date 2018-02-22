@@ -93,7 +93,7 @@ public class GameScreen extends Base2DScreen implements ActionListener {
 
         stars = new TrackingStar[NUMBER_OF_STARS];
         for (int i = 0; i < NUMBER_OF_STARS; i++) {
-            stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.003f, mainShip.getV());
+            stars[i] = new TrackingStar(atlas, Rnd.nextFloat(-0.005f, 0.005f), Rnd.nextFloat(-0.5f, -0.1f), 0.007f, mainShip.getV());
         }
         startNewGame();
     }

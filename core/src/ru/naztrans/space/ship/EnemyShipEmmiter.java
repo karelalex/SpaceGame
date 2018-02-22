@@ -51,13 +51,13 @@ public class EnemyShipEmmiter {
 
     private final EnemyShipPool enemyShipPool;
     private Rect worldBounds;
-    private Vector2 tmpV2;
+
 
 
 
     private TextureRegion bulletRegion;
     private int stage;
-    private int direction;
+
     private float velosityC;
     private int maxBullets=1;
 
@@ -76,7 +76,7 @@ public class EnemyShipEmmiter {
         stage=0;
     }
     public void generateEnemy(float delta, int frags) {
-        stage=frags/5+1;
+        stage=frags/20+1;
         generateInterval=4f-(float)stage/10f;
         generateTimer += delta;
         if (generateInterval <= generateTimer) {
@@ -110,18 +110,17 @@ public class EnemyShipEmmiter {
             }
 
 
-            enemy.pos.x = Rnd.nextFloat(worldBounds.getLeft() + enemy.getHalfWidth(), worldBounds.getRight() - enemy.getHalfWidth());
-            if (enemy.pos.x>(worldBounds.getRight()-worldBounds.getLeft())/2){
-                direction=1;
-            }
-            else {
-                direction=-1;
-            }
+
             enemy.setBottom(worldBounds.getTop());
-            enemy.set(map.get(currentship.tr), currentship.initialXVel*direction, -currentship.initialYVel*velosityC,
+            enemy.set(map.get(currentship.tr), currentship.initialXVel, -currentship.initialYVel*velosityC,
                     bulletRegion, currentship.bulletHeight, -currentship.bulletYVel,
                     currentship.bulletDamage+(int)stage/10, currentship.collisionDamage, currentship.initialReloadInterval, currentship.smallReloadInterval, maxBullets, currentship.height, currentship.initialHP );
             //System.out.println(maxBullets);
+            enemy.pos.x = Rnd.nextFloat(worldBounds.getLeft() + enemy.getHalfWidth(), worldBounds.getRight() - enemy.getHalfWidth());
+            if (enemy.pos.x>worldBounds.pos.x){
+                enemy.getV0().set(-currentship.initialXVel, -currentship.initialYVel);
+            }
+
         }
     }
 

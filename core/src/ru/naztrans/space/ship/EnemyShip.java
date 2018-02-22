@@ -24,6 +24,11 @@ public class EnemyShip extends Ship {
 
 
     private Vector2 descentV = new Vector2(0, -0.15f);
+
+    public Vector2 getV0() {
+        return v0;
+    }
+
     private Vector2 v0 = new Vector2();
     private float smallReloadInterval;
     private float smallReloadTimer;
