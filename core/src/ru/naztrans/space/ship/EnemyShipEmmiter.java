@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.HashMap;
+
 import ru.naztrans.space.engine.math.Rect;
 import ru.naztrans.space.engine.math.Rnd;
 import ru.naztrans.space.engine.utils.Regions;
@@ -13,8 +15,8 @@ import ru.naztrans.space.engine.utils.Regions;
  */
 
 public class EnemyShipEmmiter {
-    private enum ShipTypes {SMALL_SHIP("enemy0", 0.1f, 0.01f, 1, 5, 0.3f, 3f, 0.1f, 0.2f, 0f, 1), MIDDLE_SHIP("enemy1",0.11f, 0.02f, 5, 15, 0.25f, 4f, 0.2f, 0.03f, 0f, 5 ),
-        BIG_SHIP("enemy2", 0.2f, 0.04f, 10, 45, 0.3f, 4f, 0.4f, 0.005f, 0f, 20) ;
+    private enum ShipTypes {SMALL_SHIP("enemy0", 0.1f, 0.01f, 1, 5, 0.3f, 3f, 0.3f, 0.2f, 0f, 1), MIDDLE_SHIP("enemy1",0.11f, 0.02f, 5, 15, 0.25f, 4f, 0.2f, 0.03f, 0f, 5 ),
+        BIG_SHIP("enemy2", 0.2f, 0.04f, 10, 45, 0.3f, 4f, 0.4f, 0.005f, 0f, 20), SMALL_SHIP_D("enemy0", 0.1f, 0.01f, 1, 5, 0.3f, 3f, 0.3f, 0.2f, 0.3f, 1), MIDDLE_SHIP_D("enemy1",0.11f, 0.02f, 5, 15, 0.25f, 4f, 0.2f, 0.03f, 0.15f, 5 ), ;
         public String tr;
         public float height, bulletHeight;
         public int bulletDamage, collisionDamage;
@@ -50,24 +52,32 @@ public class EnemyShipEmmiter {
     private final EnemyShipPool enemyShipPool;
     private Rect worldBounds;
     private Vector2 tmpV2;
-    private  TextureRegion[] region;
+
 
 
     private TextureRegion bulletRegion;
     private int stage;
-    private TextureAtlas textureAtlas;
+    private int direction;
+    private float velosityC;
+    private int maxBullets=1;
+
+    private HashMap<String, TextureRegion[]> map=new HashMap<String, TextureRegion[]>();
     private ShipTypes currentship;
     public EnemyShipEmmiter(EnemyShipPool enemyShipPool, Rect worldBounds, TextureAtlas atlas) {
         this.enemyShipPool = enemyShipPool;
         this.worldBounds = worldBounds;
-        this.textureAtlas=atlas;
-        this.bulletRegion = textureAtlas.findRegion("bulletEnemy");
+
+        this.bulletRegion = atlas.findRegion("bulletEnemy");
+        for (ShipTypes s: ShipTypes.values()){
+            map.put(s.tr, Regions.split(atlas.findRegion(s.tr), 1,2,2));
+        }
     }
     public void setToNewGame(){
-        stage=1;
+        stage=0;
     }
     public void generateEnemy(float delta, int frags) {
-        stage=frags/20+1;
+        stage=frags/5+1;
+        generateInterval=4f-(float)stage/10f;
         generateTimer += delta;
         if (generateInterval <= generateTimer) {
             generateTimer = 0f;
@@ -75,19 +85,43 @@ public class EnemyShipEmmiter {
 
             float type = (float) Math.random();
             if (type<0.7f) {
-                currentship=ShipTypes.SMALL_SHIP;
+                if (stage>5&&type<0.3){
+                    currentship=ShipTypes.SMALL_SHIP_D;
+                }
+                else {
+                    currentship = ShipTypes.SMALL_SHIP;
+                }
             } else if (type < 0.9f) {
-                currentship=ShipTypes.MIDDLE_SHIP;
+                if (stage>10&&type<0.8){
+                    currentship=ShipTypes.MIDDLE_SHIP_D;}
+                else {
+                    currentship=ShipTypes.MIDDLE_SHIP;
+                }
             } else {
                 currentship=ShipTypes.BIG_SHIP;
             }
-            region=Regions.split(textureAtlas.findRegion(currentship.tr), 1,2,2);
+            if (currentship!=ShipTypes.SMALL_SHIP&&currentship!=ShipTypes.SMALL_SHIP_D){
+                velosityC=stage/10+1;
+            }
+            else {velosityC=1;}
+            if (stage>3){
+                maxBullets = 1 + (stage / 3);
+                if (maxBullets>5) maxBullets=5;
+            }
 
-            enemy.set(region, currentship.initialXVel, -currentship.initialYVel,
-                    bulletRegion, currentship.bulletHeight, -currentship.bulletYVel,
-                    currentship.bulletDamage, currentship.collisionDamage, currentship.initialReloadInterval, currentship.smallReloadInterval, 1, currentship.height, currentship.initialHP );
+
             enemy.pos.x = Rnd.nextFloat(worldBounds.getLeft() + enemy.getHalfWidth(), worldBounds.getRight() - enemy.getHalfWidth());
+            if (enemy.pos.x>(worldBounds.getRight()-worldBounds.getLeft())/2){
+                direction=1;
+            }
+            else {
+                direction=-1;
+            }
             enemy.setBottom(worldBounds.getTop());
+            enemy.set(map.get(currentship.tr), currentship.initialXVel*direction, -currentship.initialYVel*velosityC,
+                    bulletRegion, currentship.bulletHeight, -currentship.bulletYVel,
+                    currentship.bulletDamage+(int)stage/10, currentship.collisionDamage, currentship.initialReloadInterval, currentship.smallReloadInterval, maxBullets, currentship.height, currentship.initialHP );
+            //System.out.println(maxBullets);
         }
     }
 

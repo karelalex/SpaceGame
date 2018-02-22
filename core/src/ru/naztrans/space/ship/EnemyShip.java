@@ -26,6 +26,7 @@ public class EnemyShip extends Ship {
     private Vector2 descentV = new Vector2(0, -0.15f);
     private Vector2 v0 = new Vector2();
     private float smallReloadInterval;
+    private float smallReloadTimer;
 
     public int getCollisionDamage() {
         return collisionDamage;
@@ -33,6 +34,7 @@ public class EnemyShip extends Ship {
 
     private int collisionDamage;
     private int maxBulletCountAtTime;
+    private int fireCounter;
 
     public EnemyShip(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds,  Sound shootSound, MainShip mainShip) {
         super(bulletPool, explosionPool, worldBounds, shootSound);
@@ -54,9 +56,22 @@ public class EnemyShip extends Ship {
                 break;
             case FIGHT:
                 reloadTimer += delta;
+
                 if (reloadTimer >= reloadInterval) {
                     reloadTimer = 0f;
                     fire();
+                    fireCounter=1;
+                    System.out.println("firecounter "+fireCounter);
+                    System.out.println("maxbullet^ " + maxBulletCountAtTime);
+                }
+                if(fireCounter<maxBulletCountAtTime){
+                    smallReloadTimer+=delta;
+
+                    if(smallReloadTimer>=smallReloadInterval){
+                        smallReloadTimer=0f;
+                        fire();
+                        fireCounter++;
+                    }
                 }
                 if (getTop() < worldBounds.getBottom()) {
                     mainShip.damage(bulletDamage*2);

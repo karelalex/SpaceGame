@@ -279,6 +279,7 @@ public class GameScreen extends Base2DScreen implements ActionListener {
     @Override
     public void actionPerformed(Object src) {
         if (src==newGameButton) {
+            enemyShipEmmiter.setToNewGame();
             startNewGame();
         }else {
             throw  new RuntimeException("Unknown Source Object");
